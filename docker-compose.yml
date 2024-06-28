@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: 'mongodb'
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: wishlist
+      MONGO_INITDB_ROOT_PASSWORD: wishlist
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db
+    networks:
+      - wishlist-network
+
+networks:
+  wishlist-network:
+    driver: bridge
