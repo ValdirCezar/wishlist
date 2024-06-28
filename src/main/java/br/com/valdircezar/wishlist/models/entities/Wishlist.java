@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -21,7 +22,9 @@ public class Wishlist {
     private String id;
     private String name;
     private String userId;
-    private List<String> productsId;
+
+    @Builder.Default
+    private Set<String> productsId = Set.of();
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
