@@ -8,3 +8,4 @@ spring:
       port: ${DB_PORT:27017}
       username: ${DB_USERNAME:wishlist}
       password: ${DB_PASSWORD:wishlist}
+      authentication-database: ${DB_AUTHENTICATION_DATABASE:admin}

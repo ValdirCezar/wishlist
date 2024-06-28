@@ -6,10 +6,12 @@ services:
     container_name: 'mongodb'
     restart: unless-stopped
     environment:
-      MONGO_INITDB_ROOT_USERNAME: wishlist
-      MONGO_INITDB_ROOT_PASSWORD: wishlist
+#      - MONGO_INITDB_ROOT_USERNAME=wishlist
+      - MONGO_INITDB_ROOT_PASSWORD=wishlist
     ports:
       - "27017:27017"
+    expose:
+      - "27017"
     volumes:
       - ./data:/data/db
     networks:
