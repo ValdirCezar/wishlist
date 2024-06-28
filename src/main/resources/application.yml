@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: 'wishlist'
+  data:
+    mongodb:
+      database: ${DB_NAME:wishlist}
+      host: ${DB_HOST:localhost}
+      port: ${DB_PORT:27017}
+      username: ${DB_USERNAME:wishlist}
+      password: ${DB_PASSWORD:wishlist}
