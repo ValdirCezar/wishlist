@@ -1,5 +1,6 @@
 package br.com.valdircezar.wishlist.clients;
 
+import br.com.valdircezar.wishlist.models.exceptions.ObjectNotFoundException;
 import br.com.valdircezar.wishlist.models.responses.ProductResponse;
 
 import java.math.BigDecimal;
@@ -11,7 +12,7 @@ public class ProductClientMock {
         mockProductResponse()
                 .stream().filter(product -> product.id().equals(productId))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new ObjectNotFoundException("Product not found by id: " + productId));
     }
 
     private static List<ProductResponse> mockProductResponse() {

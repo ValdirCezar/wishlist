@@ -1,5 +1,6 @@
 package br.com.valdircezar.wishlist.clients;
 
+import br.com.valdircezar.wishlist.models.exceptions.ObjectNotFoundException;
 import br.com.valdircezar.wishlist.models.responses.UserResponse;
 
 import java.util.List;
@@ -10,7 +11,7 @@ public class UserClientMock {
         mockUserResponse()
                 .stream().filter(user -> user.id().equals(userId))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ObjectNotFoundException("User not found by id: " + userId));
 
     }
 
