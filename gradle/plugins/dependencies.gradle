@@ -1,0 +1,21 @@
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation ("org.springframework.boot:spring-boot-starter-data-mongodb") {
+        because("Starter to integrate MongoDB with Spring Data")
+    }
+
+    implementation ("org.springframework.boot:spring-boot-starter-web") {
+        because("Starter for building applications using Spring MVC. Uses Tomcat as the default embedded container")
+    }
+
+    testImplementation ("org.springframework.boot:spring-boot-starter-test") {
+        because("Starter for testing Spring Boot applications with libraries including JUnit, Hamcrest and Mockito")
+    }
+
+    testRuntimeOnly ("org.junit.platform:junit-platform-launcher") {
+        because("Test runtime for running JUnit 5 tests")
+    }
+}
