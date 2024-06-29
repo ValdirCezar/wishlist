@@ -9,3 +9,9 @@ spring:
       username: ${DB_USERNAME:wishlist}
       password: ${DB_PASSWORD:wishlist}
       authentication-database: ${DB_AUTHENTICATION_DATABASE:admin}
+
+springdoc:
+  openapi:
+    title: 'Wishlist API'
+    description: 'API exemplo para gerenciamento de lista de desejos em um e-commerce.'
+    version: '1.0.0'
