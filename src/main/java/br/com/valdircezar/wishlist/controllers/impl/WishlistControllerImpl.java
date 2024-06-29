@@ -2,6 +2,7 @@ package br.com.valdircezar.wishlist.controllers.impl;
 
 import br.com.valdircezar.wishlist.controllers.WishlistController;
 import br.com.valdircezar.wishlist.models.entities.Wishlist;
+import br.com.valdircezar.wishlist.models.requests.AddNewProductRequest;
 import br.com.valdircezar.wishlist.models.requests.CreateWishlistRequest;
 import br.com.valdircezar.wishlist.models.responses.WishlistResponse;
 import br.com.valdircezar.wishlist.services.WishlistService;
@@ -26,7 +27,13 @@ public class WishlistControllerImpl implements WishlistController {
     }
 
     @Override
-    public ResponseEntity<WishlistResponse> findById(String id) {
-        return ResponseEntity.ok(wishlistService.findById(id));
+    public ResponseEntity<WishlistResponse> findById(String wishlistId) {
+        return ResponseEntity.ok(wishlistService.findById(wishlistId));
+    }
+
+    @Override
+    public ResponseEntity<Void> addProduct(String wishlistId, AddNewProductRequest productRequest) {
+        wishlistService.addProduct(wishlistId, productRequest);
+        return ResponseEntity.ok().build();
     }
 }

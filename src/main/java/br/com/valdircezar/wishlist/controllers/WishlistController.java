@@ -1,6 +1,7 @@
 package br.com.valdircezar.wishlist.controllers;
 
 import br.com.valdircezar.wishlist.models.exceptions.StandardError;
+import br.com.valdircezar.wishlist.models.requests.AddNewProductRequest;
 import br.com.valdircezar.wishlist.models.requests.CreateWishlistRequest;
 import br.com.valdircezar.wishlist.models.responses.WishlistResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RequestMapping(value = "v1/wishlists")
-@Tag(name = "WishlistController", description = "Controller responsible for managing wishlists")
+@Tag(name = "WishlistController", description = "Controller responsável por gerenciar as Wishlists")
 public interface WishlistController {
 
     @Operation(summary = "Criar uma nova Wishlist")
@@ -32,6 +33,10 @@ public interface WishlistController {
             ),
             @ApiResponse(
                     responseCode = "404", description = "Not found",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "422", description = "Unprocessable entity",
                     content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
             ),
             @ApiResponse(
@@ -63,5 +68,35 @@ public interface WishlistController {
     ResponseEntity<WishlistResponse> findById(
             @Parameter(description = "Wishlist id", example = "997f2e1a9f5cf6e2ca4beae3")
             @PathVariable(name = "wishlistId") String wishlistId
+    );
+
+    @Operation(summary = "Adicionar um produto na Wishlist")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200", description = "Product added",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = WishlistResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400", description = "Bad request",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404", description = "Not found",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "422", description = "Unprocessable entity",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            )
+    })
+    @PatchMapping(value = "/{wishlistId}/add-product")
+    ResponseEntity<Void> addProduct(
+            @Parameter(description = "Wishlist id", example = "997f2e1a9f5cf6e2ca4beae3")
+            @PathVariable(name = "wishlistId") String wishlistId,
+            @RequestBody @Valid AddNewProductRequest productRequest
     );
 }
