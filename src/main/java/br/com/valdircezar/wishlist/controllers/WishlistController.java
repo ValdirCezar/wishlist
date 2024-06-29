@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RequestMapping(value = "v1/wishlists")
-@Tag(name = "Wishlist", description = "Controller responsible for managing wishlists")
+@Tag(name = "WishlistController", description = "Controller responsible for managing wishlists")
 public interface WishlistController {
 
-    @Operation(summary = "Create a new wishlist")
+    @Operation(summary = "Criar uma nova Wishlist")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "201", description = "Wishlist created",
@@ -44,7 +44,7 @@ public interface WishlistController {
             @RequestBody @Valid CreateWishlistRequest wishlistRequest
     );
 
-    @Operation(summary = "Find a wishlist by id")
+    @Operation(summary = "Consultar todos os produtos da Wishlist do cliente pelo id da Wishlist")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200", description = "Wishlist found",
@@ -59,9 +59,9 @@ public interface WishlistController {
                     content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
             )
     })
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{wishlistId}")
     ResponseEntity<WishlistResponse> findById(
             @Parameter(description = "Wishlist id", example = "997f2e1a9f5cf6e2ca4beae3")
-            @PathVariable(name = "id") String id
+            @PathVariable(name = "wishlistId") String wishlistId
     );
 }

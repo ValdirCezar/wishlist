@@ -5,6 +5,7 @@ import br.com.valdircezar.wishlist.mappers.WishlistMapper;
 import br.com.valdircezar.wishlist.models.entities.Wishlist;
 import br.com.valdircezar.wishlist.models.exceptions.ObjectNotFoundException;
 import br.com.valdircezar.wishlist.models.requests.CreateWishlistRequest;
+import br.com.valdircezar.wishlist.models.responses.ProductResponse;
 import br.com.valdircezar.wishlist.models.responses.WishlistResponse;
 import br.com.valdircezar.wishlist.repositories.WishlistRepository;
 import br.com.valdircezar.wishlist.services.validations.WishlistPreValidation;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +36,12 @@ public class WishlistService {
                 .map(product -> ProductClientMock.findById(product).price())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return wishlistMapper.toResponse(entity, totalValue);
+        Set<ProductResponse> productResponseList = entity.getProductsIds().stream()
+                .map(ProductClientMock::findById)
+                .collect(Collectors.toSet());
+
+        return wishlistMapper.toResponse(entity, totalValue, productResponseList);
     }
+
 
 }
