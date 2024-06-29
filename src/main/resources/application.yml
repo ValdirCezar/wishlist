@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: 'wishlist'
+  data:
+    mongodb:
+      database: ${DB_NAME:wishlist}
+      host: ${DB_HOST:localhost}
+      port: ${DB_PORT:27017}
+      username: ${DB_USERNAME:wishlist}
+      password: ${DB_PASSWORD:wishlist}
+      authentication-database: ${DB_AUTHENTICATION_DATABASE:admin}
+
+springdoc:
+  openapi:
+    title: 'Wishlist API'
+    description: 'API exemplo para gerenciamento de lista de desejos em um e-commerce.'
+    version: '1.0.0'

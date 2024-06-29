@@ -1,0 +1,49 @@
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb") {
+        because("Starter to integrate MongoDB with Spring Data")
+    }
+
+    implementation("org.springframework.boot:spring-boot-starter-web") {
+        because("Starter for building applications using Spring MVC. Uses Tomcat as the default embedded container")
+    }
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        because("Starter for testing Spring Boot applications with libraries including JUnit, Hamcrest and Mockito")
+    }
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher") {
+        because("Test runtime for running JUnit 5 tests")
+    }
+
+    compileOnly("org.projectlombok:lombok") {
+        because("Lombok eliminates boilerplate code for Java classes")
+    }
+
+    annotationProcessor("org.projectlombok:lombok") {
+        because("Lombok eliminates boilerplate code for Java classes")
+    }
+
+    implementation("org.projectlombok:lombok-mapstruct-binding:0.2.0") {
+        because("Binding for MapStruct with Lombok")
+    }
+
+    implementation("org.mapstruct:mapstruct:1.5.3.Final") {
+        because("An annotation processor for generating type-safe bean mapping classes")
+    }
+
+    annotationProcessor("org.mapstruct:mapstruct-processor:1.5.3.Final") {
+        because("An annotation processor for generating type-safe bean mapping classes")
+    }
+
+    implementation("org.springframework.boot:spring-boot-starter-validation") {
+        because("Starter for using Java Bean Validation with Hibernate Validator")
+    }
+
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0") {
+        because("Springdoc OpenAPI 3 integration with Spring Boot")
+    }
+}
