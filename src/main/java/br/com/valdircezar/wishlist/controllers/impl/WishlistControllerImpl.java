@@ -3,6 +3,7 @@ package br.com.valdircezar.wishlist.controllers.impl;
 import br.com.valdircezar.wishlist.controllers.WishlistController;
 import br.com.valdircezar.wishlist.models.entities.Wishlist;
 import br.com.valdircezar.wishlist.models.requests.CreateWishlistRequest;
+import br.com.valdircezar.wishlist.models.responses.WishlistResponse;
 import br.com.valdircezar.wishlist.services.WishlistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,5 +23,10 @@ public class WishlistControllerImpl implements WishlistController {
         return ResponseEntity.created(
                 fromCurrentRequest().path("/{id}").buildAndExpand(wishlist.getId()).toUri()
         ).build();
+    }
+
+    @Override
+    public ResponseEntity<WishlistResponse> findById(String id) {
+        return ResponseEntity.ok(wishlistService.findById(id));
     }
 }

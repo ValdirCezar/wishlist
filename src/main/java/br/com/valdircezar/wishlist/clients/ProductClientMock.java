@@ -8,8 +8,8 @@ import java.util.List;
 
 public class ProductClientMock {
 
-    public static void findById(final String productId) {
-        mockProductResponse()
+    public static ProductResponse findById(final String productId) {
+        return mockProductResponse()
                 .stream().filter(product -> product.id().equals(productId))
                 .findFirst()
                 .orElseThrow(() -> new ObjectNotFoundException("Product not found by id: " + productId));

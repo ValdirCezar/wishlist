@@ -20,5 +20,5 @@ public record CreateWishlistRequest(
         String userId,
 
         @Schema(description = "List of products ID", example = "[\"997f2e1a9f5cf6e2ca4beae4\",\"333abc510d2ef9143eefa7f1\"]")
-        List<String> productsId
+        List<String> productsIds
 ) { }

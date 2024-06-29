@@ -1,15 +1,20 @@
 package br.com.valdircezar.wishlist.controllers;
 
+import br.com.valdircezar.wishlist.models.exceptions.StandardError;
 import br.com.valdircezar.wishlist.models.requests.CreateWishlistRequest;
+import br.com.valdircezar.wishlist.models.responses.WishlistResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RequestMapping(value = "v1/wishlists")
 @Tag(name = "Wishlist", description = "Controller responsible for managing wishlists")
@@ -17,13 +22,46 @@ public interface WishlistController {
 
     @Operation(summary = "Create a new wishlist")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Wishlist created successfully"),
-            @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "404", description = "User or product not found"),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
+            @ApiResponse(
+                    responseCode = "201", description = "Wishlist created",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE)
+            ),
+            @ApiResponse(
+                    responseCode = "400", description = "Bad request",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404", description = "Not found",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            )
     })
     @PostMapping
     ResponseEntity<Void> create(
             @RequestBody @Valid CreateWishlistRequest wishlistRequest
+    );
+
+    @Operation(summary = "Find a wishlist by id")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200", description = "Wishlist found",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = WishlistResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404", description = "Wishlist not found",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            )
+    })
+    @GetMapping(value = "/{id}")
+    ResponseEntity<WishlistResponse> findById(
+            @Parameter(description = "Wishlist id", example = "997f2e1a9f5cf6e2ca4beae3")
+            @PathVariable(name = "id") String id
     );
 }

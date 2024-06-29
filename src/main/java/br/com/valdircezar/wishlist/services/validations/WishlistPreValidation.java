@@ -22,7 +22,7 @@ public class WishlistPreValidation {
     public static void applyValidationRules(CreateWishlistRequest wishlistRequest) {
         validateUserExists(wishlistRequest);
         validateProductExists(wishlistRequest);
-        validateProductsQuantity(wishlistRequest.productsId().size());
+        validateProductsQuantity(wishlistRequest.productsIds().size());
     }
 
     private static void validateProductsQuantity(int productsQuantity) {
@@ -34,6 +34,6 @@ public class WishlistPreValidation {
     }
 
     private static void validateProductExists(CreateWishlistRequest wishlistRequest) {
-        wishlistRequest.productsId().forEach(ProductClientMock::findById);
+        wishlistRequest.productsIds().forEach(ProductClientMock::findById);
     }
 }
