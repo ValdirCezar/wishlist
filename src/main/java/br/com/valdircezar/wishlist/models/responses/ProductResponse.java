@@ -21,5 +21,5 @@ public class ProductResponse {
     private Integer quantity;
 
     @Schema(description = "Product price", example = "700.0")
-    private BigDecimal price;
+    private BigDecimal unityPrice;
 }

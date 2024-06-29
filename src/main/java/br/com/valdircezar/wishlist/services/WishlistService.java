@@ -34,7 +34,7 @@ public class WishlistService {
         Wishlist entity = find(wishlistId);
 
         BigDecimal totalValue = entity.getProducts().stream()
-                .map(product -> ProductClientMock.findById(product.getId()).getPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
+                .map(product -> ProductClientMock.findById(product.getId()).getUnityPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         Set<ProductResponse> products = entity.getProducts().stream()
@@ -56,6 +56,15 @@ public class WishlistService {
                 );
 
         wishlistRepository.save(wishlist);
+    }
+
+    public ProductResponse findProductById(String wishlistId, String productId) {
+        return find(wishlistId)
+                .getProducts().stream()
+                .filter(product -> product.getId().equals(productId))
+                .findFirst()
+                .map(product -> ProductClientMock.findById(product.getId()).withQuantity(product.getQuantity()))
+                .orElseThrow(() -> new ObjectNotFoundException("Product with id " + productId + " not found at wishlist."));
     }
 
     private Wishlist find(final String id) {
