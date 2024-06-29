@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
+@Schema(description = "Request structure to create a new wishlist")
 public record CreateWishlistRequest(
 
         @NotBlank(message = "Fiel name is required")
