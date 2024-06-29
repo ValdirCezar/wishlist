@@ -123,4 +123,27 @@ public interface WishlistController {
             @Parameter(description = "Product id", example = "997f2e1a9f5cf6e2ca4beae3")
             @PathVariable(name = "productId") String productId
     );
+
+    @Operation(summary = "Remover um produto da Wishlist")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "204", description = "Product removed",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = WishlistResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404", description = "Product not found",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            ),
+            @ApiResponse(
+                    responseCode = "500", description = "Internal server error",
+                    content = @Content(mediaType = APPLICATION_JSON_VALUE, schema = @Schema(implementation = StandardError.class))
+            )
+    })
+    @DeleteMapping(value = "/{wishlistId}/products/{productId}")
+    ResponseEntity<Void> removeProduct(
+            @Parameter(description = "Wishlist id", example = "997f2e1a9f5cf6e2ca4beae3")
+            @PathVariable(name = "wishlistId") String wishlistId,
+            @Parameter(description = "Product id", example = "997f2e1a9f5cf6e2ca4beae3")
+            @PathVariable(name = "productId") String productId
+    );
 }

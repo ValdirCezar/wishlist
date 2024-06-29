@@ -67,6 +67,12 @@ public class WishlistService {
                 .orElseThrow(() -> new ObjectNotFoundException("Product with id " + productId + " not found at wishlist."));
     }
 
+    public void removeProduct(String wishlistId, String productId) {
+        Wishlist wishlist = find(wishlistId);
+        wishlist.getProducts().removeIf(product -> product.getId().equals(productId));
+        wishlistRepository.save(wishlist);
+    }
+
     private Wishlist find(final String id) {
         return wishlistRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Wishlist not found by id: " + id));
     }

@@ -42,4 +42,10 @@ public class WishlistControllerImpl implements WishlistController {
     public ResponseEntity<ProductResponse> findProductById(String wishlistId, String productId) {
         return ResponseEntity.ok(wishlistService.findProductById(wishlistId, productId));
     }
+
+    @Override
+    public ResponseEntity<Void> removeProduct(String wishlistId, String productId) {
+        wishlistService.removeProduct(wishlistId, productId);
+        return ResponseEntity.noContent().build();
+    }
 }
