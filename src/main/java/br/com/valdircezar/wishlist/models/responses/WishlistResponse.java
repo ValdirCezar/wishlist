@@ -10,6 +10,9 @@ public record WishlistResponse(
         @Schema(description = "Wishlist id", example = "997f2e1a9f5cf6e2ca4beae3")
         String id,
 
+        @Schema(description = "Wishlist name", example = "Wishlist of Valdir")
+        String name,
+
         @Schema(description = "User id", example = "606b3efb74e106091aae50d8")
         String userId,
 
