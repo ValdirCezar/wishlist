@@ -1,24 +1,27 @@
 package br.com.valdircezar.wishlist.controllers;
 
+import br.com.valdircezar.wishlist.models.entities.Wishlist;
 import br.com.valdircezar.wishlist.models.requests.CreateWishlistRequest;
 import br.com.valdircezar.wishlist.services.WishlistService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Set;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -26,11 +29,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class WishlistControllerTest {
 
     private static final String BASE_URI = "/v1/wishlists";
+    private static final String USER_ID = "938abc610dcef9143eefa7f3";
+    private static final String WISHLIST_ID = "319abc510dcef9143eefa733";
+    public static final String WISHLIST_NAME = "teste";
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Mock
+    @MockBean
     private WishlistService wishlistService;
 
     @BeforeEach
@@ -39,7 +45,6 @@ class WishlistControllerTest {
     }
 
     // -------------------- TESTES PARA O ENDPOINT POST /v1/wishlists --------------------
-
     @Test
     @DisplayName("When call create method, with invalid params, then return business exception")
     void whenCall_createMethodWithInvalidParams_thenReturnBusinessException() throws Exception {
@@ -59,7 +64,24 @@ class WishlistControllerTest {
                 .andExpect(jsonPath("$.errors[?(@.fieldName=='userId' && @.message=='Field userId is required to create a new wishlist')]").exists());
     }
 
+    @Test
+    @DisplayName("When call create method, with valid params, then return created status")
+    void whenCall_createMethodWithValidParams_thenReturnCreatedStatus() throws Exception {
+        CreateWishlistRequest request = new CreateWishlistRequest(WISHLIST_NAME, USER_ID, Set.of());
 
+        Wishlist entity = new Wishlist(WISHLIST_ID, WISHLIST_NAME, USER_ID, null, null);
+        Mockito.when(wishlistService.save(Mockito.any(CreateWishlistRequest.class))).thenReturn(entity);
+
+        mockMvc.perform(
+                        post(BASE_URI)
+                                .contentType(APPLICATION_JSON)
+                                .content(toJson(request))
+                ).andExpect(status().isCreated())
+                .andExpect(header().exists("location"))
+                .andExpect(header().string("location", "http://localhost/v1/wishlists/" + entity.getId()));
+    }
+
+    @Test
 
     private String toJson(final Object object) throws Exception {
         try {
