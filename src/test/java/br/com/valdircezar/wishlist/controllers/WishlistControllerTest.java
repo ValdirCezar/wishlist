@@ -1,6 +1,7 @@
 package br.com.valdircezar.wishlist.controllers;
 
 import br.com.valdircezar.wishlist.models.entities.Wishlist;
+import br.com.valdircezar.wishlist.models.requests.AddNewProductRequest;
 import br.com.valdircezar.wishlist.models.requests.CreateWishlistRequest;
 import br.com.valdircezar.wishlist.models.responses.WishlistResponse;
 import br.com.valdircezar.wishlist.services.WishlistService;
@@ -20,11 +21,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Set;
 
 import static br.com.valdircezar.wishlist.stub.WishlistStub.generateMock;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -74,7 +76,7 @@ class WishlistControllerTest {
         CreateWishlistRequest request = new CreateWishlistRequest(WISHLIST_NAME, USER_ID, Set.of());
 
         Wishlist entity = new Wishlist(WISHLIST_ID, WISHLIST_NAME, USER_ID, null, null);
-        Mockito.when(wishlistService.save(Mockito.any(CreateWishlistRequest.class))).thenReturn(entity);
+        Mockito.when(wishlistService.save(any(CreateWishlistRequest.class))).thenReturn(entity);
 
         mockMvc.perform(
                         post(BASE_URI)
@@ -103,6 +105,39 @@ class WishlistControllerTest {
                 .andExpect(jsonPath("$.products").isArray())
                 .andExpect(jsonPath("$.products").isNotEmpty());
 
+    }
+
+    /* -------------------- TESTES PARA O ENDPOINT PATCH /v1/wishlists/{wishlistId}/add-product -------------------- */
+    @Test
+    @DisplayName("When call addProduct method, with valid wishlistId and valid product request, then return no content status")
+    void whenCall_addProductMethodWithValidWishlistIdAndValidProductRequest_thenReturnNoContentStatus() throws Exception {
+        AddNewProductRequest request = new AddNewProductRequest(WISHLIST_ID, 1);
+        doNothing().when(wishlistService).addProduct(anyString(), any(AddNewProductRequest.class));
+
+        mockMvc.perform(
+                patch(BASE_URI + "/" + WISHLIST_ID + "/add-product")
+                        .contentType(APPLICATION_JSON)
+                        .content(toJson(request))
+        ).andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("When call addProduct method, with valid wishlistId but invalid product id, then return business exception")
+    void whenCall_addProductMethodWithValidWishlistIdButInvalidProductId_thenReturnBusinessException() throws Exception {
+        AddNewProductRequest request = new AddNewProductRequest("123", 1);
+        doNothing().when(wishlistService).addProduct(anyString(), any(AddNewProductRequest.class));
+
+        mockMvc.perform(
+                patch(BASE_URI + "/" + WISHLIST_ID + "/add-product")
+                        .contentType(APPLICATION_JSON)
+                        .content(toJson(request))
+        ).andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Error on payload validation attributes"))
+                .andExpect(jsonPath("$.error").value("Validation Exception"))
+                .andExpect(jsonPath("$.path").value(BASE_URI + "/" + WISHLIST_ID + "/add-product"))
+                .andExpect(jsonPath("$.status").value(BAD_REQUEST.value()))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty())
+                .andExpect(jsonPath("$.errors[?(@.fieldName=='id' && @.message=='Field id must be between 14 and 30 characters')]").exists());
     }
 
     private String toJson(final Object object) throws Exception {
