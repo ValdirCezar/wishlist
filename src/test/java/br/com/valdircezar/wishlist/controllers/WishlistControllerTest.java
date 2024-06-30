@@ -51,7 +51,6 @@ class WishlistControllerTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    /* -------------------- TESTES PARA O ENDPOINT POST /v1/wishlists -------------------- */
     @Test
     @DisplayName("When call create method, with invalid params, then return business exception")
     void whenCall_createMethodWithInvalidParams_thenReturnBusinessException() throws Exception {
@@ -88,7 +87,6 @@ class WishlistControllerTest {
                 .andExpect(header().string("location", "http://localhost/v1/wishlists/" + entity.getId()));
     }
 
-    /* -------------------- TESTES PARA O ENDPOINT GET /v1/wishlists/{wishlistId} -------------------- */
     @Test
     @DisplayName("When call findById method, with valid id, then return wishlist response")
     void whenCall_findByIdMethodWithValidId_thenReturnWishlistResponse() throws Exception {
@@ -124,7 +122,6 @@ class WishlistControllerTest {
                 .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 
-    /* -------------------- TESTES PARA O ENDPOINT PATCH /v1/wishlists/{wishlistId}/add-product -------------------- */
     @Test
     @DisplayName("When call addProduct method, with valid wishlistId and valid product request, then return no content status")
     void whenCall_addProductMethodWithValidWishlistIdAndValidProductRequest_thenReturnNoContentStatus() throws Exception {
@@ -157,7 +154,6 @@ class WishlistControllerTest {
                 .andExpect(jsonPath("$.errors[?(@.fieldName=='id' && @.message=='Field id must be between 14 and 30 characters')]").exists());
     }
 
-    /* -------------------- TESTES PARA O ENDPOINT GET /v1/wishlists/{wishlistId}/products/{productId} -------------------- */
     @Test
     @DisplayName("When call findProductById method, with valid wishlistId and valid productId, then return product response")
     void whenCall_findProductByIdMethodWithValidWishlistIdAndValidProductId_thenReturnProductResponse() throws Exception {
@@ -172,6 +168,17 @@ class WishlistControllerTest {
                 .andExpect(jsonPath("$.name").value(response.products().iterator().next().getName()))
                 .andExpect(jsonPath("$.unityPrice").value(response.products().iterator().next().getUnityPrice()))
                 .andExpect(jsonPath("$.quantity").value(response.products().iterator().next().getQuantity()));
+    }
+
+    @Test
+    @DisplayName("When call removeProduct method, with valid wishlistId and valid productId, then return no content status")
+    void whenCall_removeProductMethodWithValidWishlistIdAndValidProductId_thenReturnNoContentStatus() throws Exception {
+        doNothing().when(wishlistService).removeProduct(anyString(), anyString());
+
+        mockMvc.perform(
+                delete(BASE_URI + "/" + WISHLIST_ID + "/products/123")
+                        .contentType(APPLICATION_JSON)
+        ).andExpect(status().isNoContent());
     }
 
     private String toJson(final Object object) throws Exception {
