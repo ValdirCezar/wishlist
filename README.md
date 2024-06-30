@@ -42,7 +42,7 @@ Imagine que esse serviço fará parte de uma plataforma construída em uma arqui
 - É possível também importar a collection do Postman disponibilizada no arquivo `collections.json` na raiz do projeto.
 - A imagem do projeto foi gerada e disponibilizada publicamente no Dockerhub.
 - Para rodar o projeto basta ter o Docker Desktop instalado e através de um terminal executar o comando `docker-compose up` para o arquivo `docker-compose.yml` que se enconta na raiz do projeto.
-
+- Não foi implementado qualquer mecânismo de segurança pois não era a intensão do teste.
 
 
 
