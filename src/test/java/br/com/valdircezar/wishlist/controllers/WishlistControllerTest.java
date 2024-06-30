@@ -1,6 +1,7 @@
 package br.com.valdircezar.wishlist.controllers;
 
 import br.com.valdircezar.wishlist.models.entities.Wishlist;
+import br.com.valdircezar.wishlist.models.exceptions.ObjectNotFoundException;
 import br.com.valdircezar.wishlist.models.requests.AddNewProductRequest;
 import br.com.valdircezar.wishlist.models.requests.CreateWishlistRequest;
 import br.com.valdircezar.wishlist.models.responses.WishlistResponse;
@@ -9,7 +10,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,6 +24,7 @@ import static br.com.valdircezar.wishlist.stub.WishlistStub.generateMock;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -76,7 +77,7 @@ class WishlistControllerTest {
         CreateWishlistRequest request = new CreateWishlistRequest(WISHLIST_NAME, USER_ID, Set.of());
 
         Wishlist entity = new Wishlist(WISHLIST_ID, WISHLIST_NAME, USER_ID, null, null);
-        Mockito.when(wishlistService.save(any(CreateWishlistRequest.class))).thenReturn(entity);
+        when(wishlistService.save(any(CreateWishlistRequest.class))).thenReturn(entity);
 
         mockMvc.perform(
                         post(BASE_URI)
@@ -92,7 +93,7 @@ class WishlistControllerTest {
     @DisplayName("When call findById method, with valid id, then return wishlist response")
     void whenCall_findByIdMethodWithValidId_thenReturnWishlistResponse() throws Exception {
         WishlistResponse response = generateMock(WishlistResponse.class);
-        Mockito.when(wishlistService.findById(anyString())).thenReturn(response);
+        when(wishlistService.findById(anyString())).thenReturn(response);
 
         mockMvc.perform(
                         get(BASE_URI + "/" + WISHLIST_ID)
@@ -105,6 +106,22 @@ class WishlistControllerTest {
                 .andExpect(jsonPath("$.products").isArray())
                 .andExpect(jsonPath("$.products").isNotEmpty());
 
+    }
+
+    @Test
+    @DisplayName("When call findById method, with invalid id, then return not found status")
+    void whenCall_findByIdMethodWithInvalidId_thenReturnNotFoundStatus() throws Exception {
+        when(wishlistService.findById(anyString())).thenThrow(new ObjectNotFoundException("Wishlist not found"));
+
+        mockMvc.perform(
+                        get(BASE_URI + "/123")
+                                .contentType(APPLICATION_JSON)
+                ).andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("Wishlist not found"))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.path").value(BASE_URI + "/123"))
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
     }
 
     /* -------------------- TESTES PARA O ENDPOINT PATCH /v1/wishlists/{wishlistId}/add-product -------------------- */
