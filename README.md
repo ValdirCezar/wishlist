@@ -32,6 +32,7 @@ Imagine que esse serviço fará parte de uma plataforma construída em uma arqui
 
 ## Observações no desenvolvimento
 - Para que eu possa gerenciar produtos de uma wishlist é necessário oferecer a opção de criar uma wishlist através de algum recurso, então criei o endpoint `POST /v1/wishlists`.
+- Ao realizar a operação de criação de uma wishlist, será retornado no headers um atributo `location: http://{servidor}/v1/wishlists/{idNovoObjeto}` que disponibiliza o caminho de acesso a esse novo recurso.
 - Uma wishlist pode conter como regra de negócio o máximo de 20 produtos, porém não foi definido uma regra quanto a quantidade desejada do produto. Ex.: Eu seleciono um lápis na loja mas informo que quero 10 unidades desse lápis ao adicioná-lo em minha wishlist.
 - Como os produtos são uma entidade técnicamente gerenciada por outro serviço, não armazenamos qualquer informação no banco de wishlist que não seja o id do produto, pois as informações do produto podem mudar teríamos uma inconsistência dos dados.
 - Ao retornar a wishlist com as informações dos produtos, vamos buscar esses produtos em um serviço externo e então calculamos o valor total da wishlist.
