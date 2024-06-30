@@ -1,4 +1,4 @@
-package br.com.valdircezar.wishlist.controllers;
+package br.com.valdircezar.wishlist.controllers.handlers;
 
 import br.com.valdircezar.wishlist.models.exceptions.BusinessException;
 import br.com.valdircezar.wishlist.models.exceptions.ObjectNotFoundException;
