@@ -157,6 +157,23 @@ class WishlistControllerTest {
                 .andExpect(jsonPath("$.errors[?(@.fieldName=='id' && @.message=='Field id must be between 14 and 30 characters')]").exists());
     }
 
+    /* -------------------- TESTES PARA O ENDPOINT GET /v1/wishlists/{wishlistId}/products/{productId} -------------------- */
+    @Test
+    @DisplayName("When call findProductById method, with valid wishlistId and valid productId, then return product response")
+    void whenCall_findProductByIdMethodWithValidWishlistIdAndValidProductId_thenReturnProductResponse() throws Exception {
+        WishlistResponse response = generateMock(WishlistResponse.class);
+        when(wishlistService.findProductById(anyString(), anyString())).thenReturn(response.products().iterator().next());
+
+        mockMvc.perform(
+                get(BASE_URI + "/" + WISHLIST_ID + "/products/123")
+                        .contentType(APPLICATION_JSON)
+        ).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(response.products().iterator().next().getId()))
+                .andExpect(jsonPath("$.name").value(response.products().iterator().next().getName()))
+                .andExpect(jsonPath("$.unityPrice").value(response.products().iterator().next().getUnityPrice()))
+                .andExpect(jsonPath("$.quantity").value(response.products().iterator().next().getQuantity()));
+    }
+
     private String toJson(final Object object) throws Exception {
         try {
             return new ObjectMapper().writeValueAsString(object);
