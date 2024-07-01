@@ -331,4 +331,58 @@ class WishlistServiceTest {
         assertNotNull(result);
         assertEquals(ProductResponse.class, result.getClass());
     }
+
+    @Test
+    @DisplayName("When call removeProduct with wishlist id not found then throw exception")
+    void whenCallRemoveProduct_withWishlistIdNotFound_thenThrowException() {
+        when(wishlistRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        try {
+            wishlistService.removeProduct("123", "123");
+        } catch (Exception e) {
+            assertEquals(ObjectNotFoundException.class, e.getClass());
+            assertEquals("Wishlist not found by id: 123", e.getMessage());
+        }
+
+        verify(wishlistRepository).findById("123");
+        verifyNoInteractions(wishlistMapper);
+    }
+
+    @Test
+    @DisplayName("When call removeProduct with product id not found then throw exception")
+    void whenCallRemoveProduct_withProductIdNotFound_thenThrowException() {
+        var wishlist = new Wishlist("123", "Test remove product", "999", Set.of(productRequest), LocalDateTime.now());
+
+        when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
+
+        try {
+            wishlistService.removeProduct("123", "123");
+        } catch (Exception e) {
+            assertEquals(ObjectNotFoundException.class, e.getClass());
+            assertEquals("Product with id 123 not found at wishlist.", e.getMessage());
+        }
+
+        verify(wishlistRepository).findById("123");
+        verifyNoMoreInteractions(wishlistRepository);
+        verifyNoInteractions(wishlistMapper);
+    }
+
+    @Test
+    @DisplayName("When call removeProduct with valid request then remove product and validate wishlist size")
+    void whenCallRemoveProduct_withValidRequest_thenRemoveProductAndValidateWishlistSize() {
+        var wishlist = new Wishlist("123", "Test remove product", "999", new HashSet<>(), LocalDateTime.now());
+        wishlist.getProducts().add(productRequest);
+
+        when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
+
+        wishlistService.removeProduct("123", productRequest.getId());
+
+        // Valida se o produto foi removido
+        assertEquals(0, wishlist.getProducts().size());
+
+        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).save(wishlist);
+    }
+
+
 }
