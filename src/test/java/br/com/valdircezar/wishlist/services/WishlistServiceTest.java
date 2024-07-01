@@ -35,6 +35,10 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 class WishlistServiceTest {
 
+    public static final String ID_123 = "123";
+    public static final String WISHLIST_NAME = "My wishlist";
+    public static final String VALID_USER_ID = "606b3efb74e106091aae50d8";
+
     @InjectMocks
     private WishlistService wishlistService;
 
@@ -49,13 +53,12 @@ class WishlistServiceTest {
     @BeforeEach
     void setUp() {
         productRequest = new ProductRequest("997f2e1a9f5cf6e2ca4beae4", 1);
-
     }
 
     @Test
     @DisplayName("When call save with products size greater than 20 then throw exception")
     void whenCallSave_withProductsSizeGreaterThan20_thenThrowException() {
-        var createWishlistRequest = new CreateWishlistRequest("Test save", "606b3efb74e106091aae50d8", Set.of());
+        var createWishlistRequest = new CreateWishlistRequest(WISHLIST_NAME, VALID_USER_ID, Set.of());
 
         createWishlistRequest.setProducts(IntStream.range(0, 21).mapToObj(i -> {
             var productResponse = ProductClientMock.getProductMockResponse().get(i);
@@ -77,14 +80,14 @@ class WishlistServiceTest {
     @Test
     @DisplayName("When call save with product id not found then throw exception")
     void whenCallSave_withProductIdNotFound_thenThrowException() {
-        var createWishlistRequest = new CreateWishlistRequest("Test save", "606b3efb74e106091aae50d8", Set.of());
-        createWishlistRequest.setProducts(Set.of(new ProductRequest("123", 1)));
+        var createWishlistRequest = new CreateWishlistRequest(WISHLIST_NAME, VALID_USER_ID, Set.of());
+        createWishlistRequest.setProducts(Set.of(new ProductRequest(ID_123, 1)));
 
         try {
             wishlistService.save(createWishlistRequest);
         } catch (Exception e) {
             assertEquals(ObjectNotFoundException.class, e.getClass());
-            assertEquals("Product not found by id: 123", e.getMessage());
+            assertEquals("Product not found by id: " + ID_123, e.getMessage());
         }
 
         verifyNoInteractions(wishlistRepository);
@@ -94,7 +97,7 @@ class WishlistServiceTest {
     @Test
     @DisplayName("When call addProduct with user id not found then throw exception")
     void whenCallAddProduct_withUserIdNotFound_thenThrowException() {
-        var createWishlistRequest = new CreateWishlistRequest("Test save", "3936", Set.of());
+        var createWishlistRequest = new CreateWishlistRequest(WISHLIST_NAME, "3936", Set.of());
         createWishlistRequest.setProducts(Set.of(productRequest));
 
         try {
@@ -111,9 +114,10 @@ class WishlistServiceTest {
     @Test
     @DisplayName("When call save with valid request then save wishlist")
     void whenCallSave_withValidRequest_thenSaveWishlist() {
-        var createWishlistRequest = new CreateWishlistRequest("Test save", "606b3efb74e106091aae50d8", Set.of(productRequest));
+        var createWishlistRequest = new CreateWishlistRequest(WISHLIST_NAME, VALID_USER_ID, Set.of(productRequest));
+
         var dateNow = LocalDateTime.now();
-        var entity = new Wishlist("123", "test", "3936", Set.of(), dateNow);
+        var entity = new Wishlist(ID_123, "test", VALID_USER_ID, Set.of(), dateNow);
 
         when(wishlistRepository.save(any(Wishlist.class))).thenReturn(entity);
         when(wishlistMapper.toEntity(any(CreateWishlistRequest.class))).thenReturn(entity);
@@ -127,40 +131,40 @@ class WishlistServiceTest {
     @Test
     @DisplayName("When call findById with wishlist id not found then throw exception")
     void whenCallFindById_withWishlistIdNotFound_thenThrowException() {
-        when(wishlistRepository.findById("123")).thenReturn(Optional.empty());
+        when(wishlistRepository.findById(ID_123)).thenReturn(Optional.empty());
 
         try {
-            wishlistService.findById("123");
+            wishlistService.findById(ID_123);
         } catch (Exception e) {
             assertEquals(ObjectNotFoundException.class, e.getClass());
             assertEquals("Wishlist not found by id: 123", e.getMessage());
         }
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verifyNoInteractions(wishlistMapper);
     }
 
     @Test
     @DisplayName("When call findById with valid request then return wishlist")
     void whenCallFindById_withValidRequest_thenReturnWishlist() {
-        var entity = new Wishlist("123", "test", "3936", Set.of(), LocalDateTime.now());
-        var response = new WishlistResponse("123", "test", "3936", Set.of(), BigDecimal.ZERO);
+        var entity = new Wishlist(ID_123, WISHLIST_NAME, VALID_USER_ID, Set.of(), LocalDateTime.now());
+        var response = new WishlistResponse(ID_123, WISHLIST_NAME, VALID_USER_ID, Set.of(), BigDecimal.ZERO);
 
-        when(wishlistRepository.findById("123")).thenReturn(Optional.of(entity));
+        when(wishlistRepository.findById(ID_123)).thenReturn(Optional.of(entity));
         when(wishlistMapper.toResponse(any(), any(), any())).thenReturn(response);
 
-        var result = wishlistService.findById("123");
+        var result = wishlistService.findById(ID_123);
 
         assertEquals(response, result);
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verify(wishlistMapper).toResponse(entity, BigDecimal.ZERO, Set.of());
     }
 
     @Test
     @DisplayName("When call findById with valid request then return correct wishlist total value")
     void whenCallFindById_withValidRequest_thenReturnCorrectWishlistTotalValue() {
-        var wishlist = new Wishlist("333", "Test find by id", "999", Set.of(), LocalDateTime.now());
+        var wishlist = new Wishlist("333", WISHLIST_NAME, VALID_USER_ID, Set.of(), LocalDateTime.now());
 
         wishlist.setProducts(IntStream.range(0, 3).mapToObj(i -> {
             var productResponse = ProductClientMock.getProductMockResponse().get(i);
@@ -168,7 +172,7 @@ class WishlistServiceTest {
         }).collect(Collectors.toSet()));
 
         when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
-        when(wishlistMapper.toResponse(any(), any(), any())).thenReturn(new WishlistResponse("333", "Test find by id", "999", any(), BigDecimal.ZERO));
+        when(wishlistMapper.toResponse(any(), any(), any())).thenReturn(new WishlistResponse("333", WISHLIST_NAME, VALID_USER_ID, any(), BigDecimal.ZERO));
 
         var result = wishlistService.findById("333");
 
@@ -179,47 +183,47 @@ class WishlistServiceTest {
         assertNotNull(result);
         assertEquals(WishlistResponse.class, result.getClass());
         assertEquals("333", result.id());
-        assertEquals("Test find by id", result.name());
+        assertEquals(WISHLIST_NAME, result.name());
     }
 
     @Test
     @DisplayName("When call addProduct with wishlist id not found then throw exception")
     void whenCallAddProduct_withWishlistIdNotFound_thenThrowException() {
-        when(wishlistRepository.findById("123")).thenReturn(Optional.empty());
+        when(wishlistRepository.findById(ID_123)).thenReturn(Optional.empty());
 
         try {
-            wishlistService.addProduct("123", new AddNewProductRequest("123", 1));
+            wishlistService.addProduct(ID_123, new AddNewProductRequest(ID_123, 1));
         } catch (Exception e) {
             assertEquals(ObjectNotFoundException.class, e.getClass());
             assertEquals("Wishlist not found by id: 123", e.getMessage());
         }
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verifyNoInteractions(wishlistMapper);
     }
 
     @Test
     @DisplayName("When call addProduct with product id not found then throw exception")
     void whenCallAddProduct_withProductIdNotFound_thenThrowException() {
-        var wishlist = new Wishlist("123", "Test add product", "999", Set.of(), LocalDateTime.now());
+        var wishlist = new Wishlist(ID_123, WISHLIST_NAME, VALID_USER_ID, Set.of(), LocalDateTime.now());
 
         when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
 
         try {
-            wishlistService.addProduct("123", new AddNewProductRequest("123", 1));
+            wishlistService.addProduct(ID_123, new AddNewProductRequest(ID_123, 1));
         } catch (Exception e) {
             assertEquals(ObjectNotFoundException.class, e.getClass());
             assertEquals("Product not found by id: 123", e.getMessage());
         }
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verifyNoInteractions(wishlistMapper);
     }
 
     @Test
     @DisplayName("When call addProduct with valid request and product already exists then increment quantity")
     void whenCallAddProduct_withValidRequestAndProductAlreadyExists_thenIncrementQuantity() {
-        var wishlist = new Wishlist("123", "Test add product", "999", Set.of(productRequest), LocalDateTime.now());
+        var wishlist = new Wishlist(ID_123, WISHLIST_NAME, VALID_USER_ID, Set.of(productRequest), LocalDateTime.now());
 
         when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
 
@@ -233,7 +237,7 @@ class WishlistServiceTest {
         var response = wishlistMapper.toResponse(wishlist, BigDecimal.TEN, productsResponses);
         when(wishlistMapper.toResponse(any(Wishlist.class), any(BigDecimal.class), anySet())).thenReturn(response);
 
-        wishlistService.addProduct("123", new AddNewProductRequest("997f2e1a9f5cf6e2ca4beae4", 1));
+        wishlistService.addProduct(ID_123, new AddNewProductRequest("997f2e1a9f5cf6e2ca4beae4", 1));
 
         // Quantidade após a operação
         int quantityAfter = wishlist.getProducts().iterator().next().getQuantity();
@@ -241,7 +245,7 @@ class WishlistServiceTest {
         // Valida quantidade
         assertEquals(quantityBefore + 1, quantityAfter);
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verify(wishlistRepository).save(wishlist);
         verify(wishlistMapper).toResponse(wishlist, BigDecimal.TEN, productsResponses);
     }
@@ -249,7 +253,7 @@ class WishlistServiceTest {
     @Test
     @DisplayName("When call addProduct with valid request and product not exists at wishlist then add product")
     void whenCallAddProduct_withValidRequestAndProductNotExistsAtWishlist_thenAddProduct() {
-        var wishlist = new Wishlist("123", "Test add product", "999", new HashSet<>(), LocalDateTime.now());
+        var wishlist = new Wishlist(ID_123, WISHLIST_NAME, VALID_USER_ID, new HashSet<>(), LocalDateTime.now());
 
         when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
 
@@ -260,12 +264,12 @@ class WishlistServiceTest {
         var response = wishlistMapper.toResponse(wishlist, BigDecimal.TEN, productsResponses);
         when(wishlistMapper.toResponse(any(Wishlist.class), any(BigDecimal.class), anySet())).thenReturn(response);
 
-        wishlistService.addProduct("123", new AddNewProductRequest("336b3efb74e106091aae50d2", 1));
+        wishlistService.addProduct(ID_123, new AddNewProductRequest("336b3efb74e106091aae50d2", 1));
 
         // Valida se o produto foi adicionado
         assertEquals(1, wishlist.getProducts().size());
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verify(wishlistRepository).save(wishlist);
         verify(wishlistMapper).toResponse(wishlist, BigDecimal.TEN, productsResponses);
     }
@@ -273,7 +277,7 @@ class WishlistServiceTest {
     @Test
     @DisplayName("When call addProduct with valid request and wishlist has 20 products then throw exception")
     void whenCallAddProduct_withValidRequestAndWishlistHas20Products_thenThrowException() {
-        var wishlist = new Wishlist("123", "Test add product", "999", new HashSet<>(), LocalDateTime.now());
+        var wishlist = new Wishlist(ID_123, WISHLIST_NAME, VALID_USER_ID, new HashSet<>(), LocalDateTime.now());
 
         wishlist.setProducts(IntStream.range(0, 20).mapToObj(i -> {
             var productResponse = ProductClientMock.getProductMockResponse().get(i);
@@ -283,12 +287,12 @@ class WishlistServiceTest {
         when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
 
         try {
-            wishlistService.addProduct("123", new AddNewProductRequest("336b3efb74e106091aae50d4", 1));
+            wishlistService.addProduct(ID_123, new AddNewProductRequest("336b3efb74e106091aae50d4", 1));
         } catch (Exception e) {
             assertEquals("The wishlist can't have more than 20 products.", e.getMessage());
         }
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verifyNoMoreInteractions(wishlistRepository);
         verifyNoInteractions(wishlistMapper);
     }
@@ -299,20 +303,20 @@ class WishlistServiceTest {
         when(wishlistRepository.findById(anyString())).thenReturn(Optional.empty());
 
         try {
-            wishlistService.findProductById("123", "123");
+            wishlistService.findProductById(ID_123, ID_123);
         } catch (Exception e) {
             assertEquals(ObjectNotFoundException.class, e.getClass());
             assertEquals("Wishlist not found by id: 123", e.getMessage());
         }
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verifyNoInteractions(wishlistMapper);
     }
 
     @Test
     @DisplayName("When call findProductById with product valid id then return product")
     void whenCallFindProductById_withProductValidId_thenReturnProduct() {
-        var wishlist = new Wishlist("123", "Test find product by id", "999", Set.of(productRequest), LocalDateTime.now());
+        var wishlist = new Wishlist(ID_123, WISHLIST_NAME, VALID_USER_ID, Set.of(productRequest), LocalDateTime.now());
 
         when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
 
@@ -323,9 +327,9 @@ class WishlistServiceTest {
         var response = wishlistMapper.toResponse(wishlist, BigDecimal.TEN, productsResponses);
         when(wishlistMapper.toResponse(any(Wishlist.class), any(BigDecimal.class), anySet())).thenReturn(response);
 
-        var result = wishlistService.findProductById("123", "997f2e1a9f5cf6e2ca4beae4");
+        var result = wishlistService.findProductById(ID_123, "997f2e1a9f5cf6e2ca4beae4");
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verify(wishlistMapper).toResponse(wishlist, BigDecimal.TEN, productsResponses);
 
         assertNotNull(result);
@@ -338,31 +342,31 @@ class WishlistServiceTest {
         when(wishlistRepository.findById(anyString())).thenReturn(Optional.empty());
 
         try {
-            wishlistService.removeProduct("123", "123");
+            wishlistService.removeProduct(ID_123, ID_123);
         } catch (Exception e) {
             assertEquals(ObjectNotFoundException.class, e.getClass());
             assertEquals("Wishlist not found by id: 123", e.getMessage());
         }
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verifyNoInteractions(wishlistMapper);
     }
 
     @Test
     @DisplayName("When call removeProduct with product id not found then throw exception")
     void whenCallRemoveProduct_withProductIdNotFound_thenThrowException() {
-        var wishlist = new Wishlist("123", "Test remove product", "999", Set.of(productRequest), LocalDateTime.now());
+        var wishlist = new Wishlist(ID_123, WISHLIST_NAME, VALID_USER_ID, Set.of(productRequest), LocalDateTime.now());
 
         when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
 
         try {
-            wishlistService.removeProduct("123", "123");
+            wishlistService.removeProduct(ID_123, ID_123);
         } catch (Exception e) {
             assertEquals(ObjectNotFoundException.class, e.getClass());
             assertEquals("Product with id 123 not found at wishlist.", e.getMessage());
         }
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verifyNoMoreInteractions(wishlistRepository);
         verifyNoInteractions(wishlistMapper);
     }
@@ -370,19 +374,18 @@ class WishlistServiceTest {
     @Test
     @DisplayName("When call removeProduct with valid request then remove product and validate wishlist size")
     void whenCallRemoveProduct_withValidRequest_thenRemoveProductAndValidateWishlistSize() {
-        var wishlist = new Wishlist("123", "Test remove product", "999", new HashSet<>(), LocalDateTime.now());
+        var wishlist = new Wishlist(ID_123, WISHLIST_NAME, VALID_USER_ID, new HashSet<>(), LocalDateTime.now());
         wishlist.getProducts().add(productRequest);
 
         when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
 
-        wishlistService.removeProduct("123", productRequest.getId());
+        wishlistService.removeProduct(ID_123, productRequest.getId());
 
         // Valida se o produto foi removido
         assertEquals(0, wishlist.getProducts().size());
 
-        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).findById(ID_123);
         verify(wishlistRepository).save(wishlist);
     }
-
 
 }
