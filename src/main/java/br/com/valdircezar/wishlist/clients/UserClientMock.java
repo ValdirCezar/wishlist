@@ -5,6 +5,10 @@ import br.com.valdircezar.wishlist.models.responses.UserResponse;
 
 import java.util.List;
 
+/**
+ * Por se tratar de um client mockado não criei como um componente gerenciado do spring boot
+ * e por esse motivo não será adicionado qualquer tratativa de falha nas "requisiçoes externas".
+ */
 public class UserClientMock {
 
     public static void findById(final String userId) {

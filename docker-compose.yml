@@ -6,7 +6,7 @@ services:
     container_name: 'mongodb'
     restart: unless-stopped
     environment:
-#      - MONGO_INITDB_ROOT_USERNAME=wishlist
+      - MONGO_INITDB_ROOT_USERNAME=wishlist
       - MONGO_INITDB_ROOT_PASSWORD=wishlist
     ports:
       - "27017:27017"
@@ -14,6 +14,28 @@ services:
       - "27017"
     volumes:
       - ./data:/data/db
+    networks:
+      - wishlist-network
+
+  wishlist-api:
+    image: valdircezar/wishlist-api:latest
+#    build:
+#      dockerfile: Dockerfile // Caso não queira usar a imagem do Docker Hub basta descomentar essa linha e comentar a linha acima
+    container_name: 'wishlist-api'
+    environment:
+      - DB_NAME=wishlist
+      - DB_HOST=mongodb
+      - DB_PORT=27017
+      - DB_USERNAME=wishlist
+      - DB_PASSWORD=wishlist
+      - DB_AUTHENTICATION_DATABASE=admin
+      - SERVER_PORT=8080
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    depends_on:
+      - mongodb
     networks:
       - wishlist-network
 

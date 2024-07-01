@@ -1,6 +1,8 @@
 spring:
   application:
     name: 'wishlist'
+  profiles:
+    active: ${PROFILE_ACTIVE}
   data:
     mongodb:
       database: ${DB_NAME:wishlist}
@@ -15,3 +17,6 @@ springdoc:
     title: 'Wishlist API'
     description: 'API exemplo para gerenciamento de lista de desejos em um e-commerce.'
     version: '1.0.0'
+
+server:
+  port: ${SERVER_PORT:8080}
