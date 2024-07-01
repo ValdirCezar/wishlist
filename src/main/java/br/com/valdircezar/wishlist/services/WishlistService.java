@@ -34,13 +34,13 @@ public class WishlistService {
     public WishlistResponse findById(final String wishlistId) {
         Wishlist entity = find(wishlistId);
 
-        BigDecimal totalValue = entity.getProducts().stream()
-                .map(product -> ProductClientMock.findById(product.getId()).getUnityPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
         Set<ProductResponse> products = entity.getProducts().stream()
                 .map(product -> ProductClientMock.findById(product.getId()).withQuantity(product.getQuantity()))
                 .collect(Collectors.toSet());
+
+        BigDecimal totalValue = products.stream()
+                .map(product -> product.getUnityPrice().multiply(BigDecimal.valueOf(product.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return wishlistMapper.toResponse(entity, totalValue, products);
     }
