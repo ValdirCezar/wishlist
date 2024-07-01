@@ -51,7 +51,7 @@ class WishlistControllerTest {
     }
 
     @Test
-    @DisplayName("When call create method, with invalid params, then return business exception")
+    @DisplayName("When call create method, with invalid params, then return bad request")
     void whenCall_createMethodWithInvalidParams_thenReturnBusinessException() throws Exception {
         CreateWishlistRequest request = new CreateWishlistRequest();
 
@@ -135,7 +135,7 @@ class WishlistControllerTest {
     }
 
     @Test
-    @DisplayName("When call addProduct method, with valid wishlistId but invalid product id, then return business exception")
+    @DisplayName("When call addProduct method, with valid wishlistId but invalid product id, then return bad request")
     void whenCall_addProductMethodWithValidWishlistIdButInvalidProductId_thenReturnBusinessException() throws Exception {
         AddNewProductRequest request = new AddNewProductRequest("123", 1);
         doNothing().when(wishlistService).addProduct(anyString(), any(AddNewProductRequest.class));
