@@ -4,8 +4,10 @@ import br.com.valdircezar.wishlist.clients.ProductClientMock;
 import br.com.valdircezar.wishlist.mappers.WishlistMapper;
 import br.com.valdircezar.wishlist.models.entities.Wishlist;
 import br.com.valdircezar.wishlist.models.exceptions.ObjectNotFoundException;
+import br.com.valdircezar.wishlist.models.requests.AddNewProductRequest;
 import br.com.valdircezar.wishlist.models.requests.CreateWishlistRequest;
 import br.com.valdircezar.wishlist.models.requests.ProductRequest;
+import br.com.valdircezar.wishlist.models.responses.ProductResponse;
 import br.com.valdircezar.wishlist.models.responses.WishlistResponse;
 import br.com.valdircezar.wishlist.repositories.WishlistRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -177,5 +180,116 @@ class WishlistServiceTest {
         assertEquals(WishlistResponse.class, result.getClass());
         assertEquals("333", result.id());
         assertEquals("Test find by id", result.name());
+    }
+
+    @Test
+    @DisplayName("When call addProduct with wishlist id not found then throw exception")
+    void whenCallAddProduct_withWishlistIdNotFound_thenThrowException() {
+        when(wishlistRepository.findById("123")).thenReturn(Optional.empty());
+
+        try {
+            wishlistService.addProduct("123", new AddNewProductRequest("123", 1));
+        } catch (Exception e) {
+            assertEquals(ObjectNotFoundException.class, e.getClass());
+            assertEquals("Wishlist not found by id: 123", e.getMessage());
+        }
+
+        verify(wishlistRepository).findById("123");
+        verifyNoInteractions(wishlistMapper);
+    }
+
+    @Test
+    @DisplayName("When call addProduct with product id not found then throw exception")
+    void whenCallAddProduct_withProductIdNotFound_thenThrowException() {
+        var wishlist = new Wishlist("123", "Test add product", "999", Set.of(), LocalDateTime.now());
+
+        when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
+
+        try {
+            wishlistService.addProduct("123", new AddNewProductRequest("123", 1));
+        } catch (Exception e) {
+            assertEquals(ObjectNotFoundException.class, e.getClass());
+            assertEquals("Product not found by id: 123", e.getMessage());
+        }
+
+        verify(wishlistRepository).findById("123");
+        verifyNoInteractions(wishlistMapper);
+    }
+
+    @Test
+    @DisplayName("When call addProduct with valid request and product already exists then increment quantity")
+    void whenCallAddProduct_withValidRequestAndProductAlreadyExists_thenIncrementQuantity() {
+        var wishlist = new Wishlist("123", "Test add product", "999", Set.of(productRequest), LocalDateTime.now());
+
+        when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
+
+        // Quantidade antes das operação
+        int quantityBefore = wishlist.getProducts().iterator().next().getQuantity();
+
+        Set<ProductResponse> productsResponses = wishlist.getProducts().stream()
+                .map(product -> ProductClientMock.getProductMockResponse().getFirst().withQuantity(product.getQuantity()))
+                .collect(Collectors.toSet());
+
+        var response = wishlistMapper.toResponse(wishlist, BigDecimal.TEN, productsResponses);
+        when(wishlistMapper.toResponse(any(Wishlist.class), any(BigDecimal.class), anySet())).thenReturn(response);
+
+        wishlistService.addProduct("123", new AddNewProductRequest("997f2e1a9f5cf6e2ca4beae4", 1));
+
+        // Quantidade após a operação
+        int quantityAfter = wishlist.getProducts().iterator().next().getQuantity();
+
+        // Valida quantidade
+        assertEquals(quantityBefore + 1, quantityAfter);
+
+        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).save(wishlist);
+        verify(wishlistMapper).toResponse(wishlist, BigDecimal.TEN, productsResponses);
+    }
+
+    @Test
+    @DisplayName("When call addProduct with valid request and product not exists at wishlist then add product")
+    void whenCallAddProduct_withValidRequestAndProductNotExistsAtWishlist_thenAddProduct() {
+        var wishlist = new Wishlist("123", "Test add product", "999", new HashSet<>(), LocalDateTime.now());
+
+        when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
+
+        Set<ProductResponse> productsResponses = wishlist.getProducts().stream()
+                .map(product -> ProductClientMock.getProductMockResponse().getFirst().withQuantity(product.getQuantity()))
+                .collect(Collectors.toSet());
+
+        var response = wishlistMapper.toResponse(wishlist, BigDecimal.TEN, productsResponses);
+        when(wishlistMapper.toResponse(any(Wishlist.class), any(BigDecimal.class), anySet())).thenReturn(response);
+
+        wishlistService.addProduct("123", new AddNewProductRequest("336b3efb74e106091aae50d2", 1));
+
+        // Valida se o produto foi adicionado
+        assertEquals(1, wishlist.getProducts().size());
+
+        verify(wishlistRepository).findById("123");
+        verify(wishlistRepository).save(wishlist);
+        verify(wishlistMapper).toResponse(wishlist, BigDecimal.TEN, productsResponses);
+    }
+
+    @Test
+    @DisplayName("When call addProduct with valid request and wishlist has 20 products then throw exception")
+    void whenCallAddProduct_withValidRequestAndWishlistHas20Products_thenThrowException() {
+        var wishlist = new Wishlist("123", "Test add product", "999", new HashSet<>(), LocalDateTime.now());
+
+        wishlist.setProducts(IntStream.range(0, 20).mapToObj(i -> {
+            var productResponse = ProductClientMock.getProductMockResponse().get(i);
+            return new ProductRequest(productResponse.getId(), 1);
+        }).collect(Collectors.toSet()));
+
+        when(wishlistRepository.findById(anyString())).thenReturn(Optional.of(wishlist));
+
+        try {
+            wishlistService.addProduct("123", new AddNewProductRequest("336b3efb74e106091aae50d4", 1));
+        } catch (Exception e) {
+            assertEquals("The wishlist can't have more than 20 products.", e.getMessage());
+        }
+
+        verify(wishlistRepository).findById("123");
+        verifyNoMoreInteractions(wishlistRepository);
+        verifyNoInteractions(wishlistMapper);
     }
 }

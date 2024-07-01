@@ -56,7 +56,10 @@ public class WishlistService {
                             ProductClientMock.findById(productRequest.id());
                             product.incrementQuantity(productRequest.quantity());
                         },
-                        () -> wishlist.getProducts().add(new ProductRequest(productRequest.id(), productRequest.quantity()))
+                        () -> {
+                            ProductClientMock.findById(productRequest.id());
+                            wishlist.getProducts().add(new ProductRequest(productRequest.id(), productRequest.quantity()));
+                        }
                 );
 
         validateWishlistSize(wishlist.getProducts().size());
