@@ -110,22 +110,38 @@ Caso queira simular o cenário de no máximo 20 produtos podes copiar essa estru
 
 <h1 align="center">Diagramas de sequência</h1>
 
-<p align="center">
-<img width="70%" height="300" alt="Diagrama de sequência 1" src="https://github.com/ValdirCezar/wishlist/assets/58149445/95687eac-0764-425c-9c43-36bb7da5870c">
+<style>
+  /* Estilo padrão para desktop */
+ .diagrama {
+    width: 70%;
+    height: 300px;
+  }
+
+  /* Estilo para dispositivos móveis */
+  @media screen and (max-width: 600px) {
+   .diagrama {
+      width: 100%;
+    }
+  }
+</style>
+
+<p class="diagrama" align="center">
+<img alt="Diagrama de sequência 1" src="https://github.com/ValdirCezar/wishlist/assets/58149445/95687eac-0764-425c-9c43-36bb7da5870c">
 </p>
 
-<p align="center">
-<img width="70%" height="300" alt="Diagrama de sequência 2" src="https://github.com/ValdirCezar/wishlist/assets/58149445/2cad8e0e-bd2b-461c-8799-51d8a3c2cce5">
+<p class="diagrama" align="center">
+<img alt="Diagrama de sequência 2" src="https://github.com/ValdirCezar/wishlist/assets/58149445/2cad8e0e-bd2b-461c-8799-51d8a3c2cce5">
 </p>
 
-<p align="center">
-<img width="70%" height="300" alt="Diagrama de sequência 3" src="https://github.com/ValdirCezar/wishlist/assets/58149445/c763039c-99ea-465b-92fe-aa445bfcaf5c">
+<p class="diagrama" align="center">
+<img alt="Diagrama de sequência 3" src="https://github.com/ValdirCezar/wishlist/assets/58149445/c763039c-99ea-465b-92fe-aa445bfcaf5c">
 </p>
 
-<p align="center">
-<img width="70%" height="300" alt="Diagrama de sequência 4" src="https://github.com/ValdirCezar/wishlist/assets/58149445/2696d9ad-9699-4fb7-8b13-94e3583d2df3">
+<p class="diagrama" align="center">
+<img alt="Diagrama de sequência 4" src="https://github.com/ValdirCezar/wishlist/assets/58149445/2696d9ad-9699-4fb7-8b13-94e3583d2df3">
 </p>
 
-<p align="center">
-<img width="70%" height="300" alt="Diagrama de sequência 5" src="https://github.com/ValdirCezar/wishlist/assets/58149445/01992d50-3c6d-4278-8aa4-30311ea63610">
+<p class="diagrama" align="center">
+<img alt="Diagrama de sequência 5" src="https://github.com/ValdirCezar/wishlist/assets/58149445/01992d50-3c6d-4278-8aa4-30311ea63610">
 </p>
+
