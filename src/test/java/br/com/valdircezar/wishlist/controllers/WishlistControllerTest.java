@@ -23,8 +23,7 @@ import java.util.Set;
 import static br.com.valdircezar.wishlist.stub.WishlistStub.generateMock;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -180,6 +179,23 @@ class WishlistControllerTest {
                         .contentType(APPLICATION_JSON)
         ).andExpect(status().isNoContent());
     }
+
+    @Test
+    @DisplayName("When call removeProduct method, throws internal error, then return internal server error status")
+    void whenCall_removeProductMethodThrowsInternalError_thenReturnInternalServerErrorStatus() throws Exception {
+        doThrow(new InternalError("Internal error")).when(wishlistService).removeProduct(anyString(), anyString());
+
+        mockMvc.perform(
+                delete(BASE_URI + "/" + WISHLIST_ID + "/products/123")
+                        .contentType(APPLICATION_JSON)
+        ).andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value("We are sorry, but an internal error occurred. Please try again later."))
+                .andExpect(jsonPath("$.error").value("Internal Server Error"))
+                .andExpect(jsonPath("$.path").value(BASE_URI + "/" + WISHLIST_ID + "/products/123"))
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.timestamp").isNotEmpty());
+    }
+
 
     private String toJson(final Object object) throws Exception {
         try {
