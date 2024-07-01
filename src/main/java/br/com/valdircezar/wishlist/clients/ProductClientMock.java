@@ -9,13 +9,13 @@ import java.util.List;
 public class ProductClientMock {
 
     public static ProductResponse findById(final String productId) {
-        return mockProductResponse()
+        return getProductMockResponse()
                 .stream().filter(product -> product.getId().equals(productId))
                 .findFirst()
                 .orElseThrow(() -> new ObjectNotFoundException("Product not found by id: " + productId));
     }
 
-    private static List<ProductResponse> mockProductResponse() {
+    public static List<ProductResponse> getProductMockResponse() {
         return List.of(
                 new ProductResponse("336b3efb74e106091aae50d3", "HyperX Headset", null, BigDecimal.valueOf(800.50)),
                 new ProductResponse("997f2e1a9f5cf6e2ca4beae4", "Apple Mouse", null, BigDecimal.valueOf(200.0)),

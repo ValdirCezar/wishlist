@@ -26,7 +26,8 @@ public class WishlistService {
     private final WishlistMapper wishlistMapper;
 
     public Wishlist save(CreateWishlistRequest wishlistRequest) {
-        WishlistPreValidation.applyValidationRules(wishlistRequest);
+        validateWishlistSize(wishlistRequest.getProducts().size());
+        WishlistPreValidation.validateIds(wishlistRequest);
         return wishlistRepository.save(wishlistMapper.toEntity(wishlistRequest));
     }
 
@@ -51,10 +52,14 @@ public class WishlistService {
                 .filter(product -> product.getId().equals(productRequest.id()))
                 .findFirst()
                 .ifPresentOrElse(
-                        product -> product.incrementQuantity(productRequest.quantity()),
+                        product -> {
+                            ProductClientMock.findById(productRequest.id());
+                            product.incrementQuantity(productRequest.quantity());
+                        },
                         () -> wishlist.getProducts().add(new ProductRequest(productRequest.id(), productRequest.quantity()))
                 );
 
+        validateWishlistSize(wishlist.getProducts().size());
         wishlistRepository.save(wishlist);
     }
 
@@ -69,11 +74,25 @@ public class WishlistService {
 
     public void removeProduct(String wishlistId, String productId) {
         Wishlist wishlist = find(wishlistId);
-        wishlist.getProducts().removeIf(product -> product.getId().equals(productId));
+
+        wishlist.getProducts()
+                .stream().filter(product -> product.getId().equals(productId))
+                .findFirst()
+                .ifPresentOrElse(
+                        product -> wishlist.getProducts().remove(product),
+                        () -> {
+                            throw new ObjectNotFoundException("Product with id " + productId + " not found at wishlist.");
+                        }
+                );
+
         wishlistRepository.save(wishlist);
     }
 
     private Wishlist find(final String id) {
         return wishlistRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("Wishlist not found by id: " + id));
+    }
+
+    private static void validateWishlistSize(Integer size) {
+        if (size > 20) throw new IllegalArgumentException("The wishlist can't have more than 20 products.");
     }
 }

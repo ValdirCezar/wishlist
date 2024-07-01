@@ -2,7 +2,6 @@ package br.com.valdircezar.wishlist.services.validations;
 
 import br.com.valdircezar.wishlist.clients.ProductClientMock;
 import br.com.valdircezar.wishlist.clients.UserClientMock;
-import br.com.valdircezar.wishlist.models.exceptions.BusinessException;
 import br.com.valdircezar.wishlist.models.requests.CreateWishlistRequest;
 
 /**
@@ -19,14 +18,9 @@ public class WishlistPreValidation {
      *
      * @param wishlistRequest the request to create a wishlist
      */
-    public static void applyValidationRules(CreateWishlistRequest wishlistRequest) {
+    public static void validateIds(CreateWishlistRequest wishlistRequest) {
         validateUserExists(wishlistRequest);
         validateProductExists(wishlistRequest);
-        validateProductsQuantity(wishlistRequest.getProducts().size());
-    }
-
-    private static void validateProductsQuantity(int productsQuantity) {
-        if (productsQuantity > 20) throw new BusinessException("Wishlist cannot have more than 20 products");
     }
 
     private static void validateUserExists(CreateWishlistRequest wishlistRequest) {
@@ -34,6 +28,7 @@ public class WishlistPreValidation {
     }
 
     private static void validateProductExists(CreateWishlistRequest wishlistRequest) {
-        wishlistRequest.getProducts().forEach(product -> ProductClientMock.findById(product.getId()));
+        if (wishlistRequest.getProducts() != null)
+            wishlistRequest.getProducts().forEach(product -> ProductClientMock.findById(product.getId()));
     }
 }
