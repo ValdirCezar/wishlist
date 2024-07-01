@@ -108,7 +108,8 @@ Caso queira simular o cenário de no máximo 20 produtos podes copiar essa estru
 
 ```
 
-## Diagramas de sequência
+<h1 align="center">
+Diagramas de sequência
 
 <p align="center">
 <img width="899" alt="image" src="https://github.com/ValdirCezar/wishlist/assets/58149445/95687eac-0764-425c-9c43-36bb7da5870c">
