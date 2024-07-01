@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: 'wishlist'
+
+springdoc:
+  openapi:
+    title: 'Wishlist API'
+    description: 'API exemplo para gerenciamento de lista de desejos em um e-commerce.'
+    version: '1.0.0'

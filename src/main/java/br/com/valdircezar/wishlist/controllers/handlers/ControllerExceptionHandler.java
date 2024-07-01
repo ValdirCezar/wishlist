@@ -1,6 +1,5 @@
-package br.com.valdircezar.wishlist.controllers;
+package br.com.valdircezar.wishlist.controllers.handlers;
 
-import br.com.valdircezar.wishlist.models.exceptions.BusinessException;
 import br.com.valdircezar.wishlist.models.exceptions.ObjectNotFoundException;
 import br.com.valdircezar.wishlist.models.exceptions.StandardError;
 import br.com.valdircezar.wishlist.models.exceptions.ValidationException;
@@ -31,22 +30,6 @@ public class ControllerExceptionHandler {
                         .timestamp(now())
                         .status(NOT_FOUND.value())
                         .error(NOT_FOUND.getReasonPhrase())
-                        .message(ex.getMessage())
-                        .path(request.getRequestURI())
-                        .build()
-        );
-    }
-
-    @ExceptionHandler(BusinessException.class)
-    ResponseEntity<StandardError> handleNotFoundException(
-            final BusinessException ex, final HttpServletRequest request
-    ) {
-        log.error("Object not found exception: {}", ex.getMessage());
-        return ResponseEntity.status(UNPROCESSABLE_ENTITY).body(
-                StandardError.builder()
-                        .timestamp(now())
-                        .status(UNPROCESSABLE_ENTITY.value())
-                        .error("Business Exception")
                         .message(ex.getMessage())
                         .path(request.getRequestURI())
                         .build()
